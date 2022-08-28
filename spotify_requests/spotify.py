@@ -86,7 +86,6 @@ AUTH_URL = "{}/?{}".format(SPOTIFY_AUTH_URL, URL_ARGS)
 
 
 def authorize(auth_token):
-    print(auth_token)
     code_payload = {
         "grant_type": "authorization_code",
         "code": str(auth_token),
@@ -112,6 +111,7 @@ def authorize(auth_token):
 
     # use the access token to access Spotify API
     auth_header = {"Authorization": "Bearer {}".format(access_token)}
+    print(auth_header)
     return auth_header
 
 # ---------------- 2. ARTISTS ------------------------

@@ -7,6 +7,7 @@
 '''
 
 import json
+import threading
 from flask import Flask, request, redirect, g, render_template, session
 from spotify_requests import spotify
 app = Flask(__name__)
@@ -22,10 +23,9 @@ def auth():
 @app.route("/callback/")
 def callback():
     auth_token = request.args['code']
-    print(auth_token)
     auth_header = spotify.authorize(auth_token)
     session['auth_header'] = auth_header
-
+    print(auth_header)
     return profile()
 
 def valid_token(resp):
@@ -96,6 +96,20 @@ def artist(id):
                            image_url=image_url)
 
 
+@app.route('/run-script')
+def run_script():
+    access_token = request.args.get("code")
+    def get_track_list_len():
+        threading.Timer(8.0, get_track_list_len).start()
+        # # get user playlist data
+        playlist_data = spotify.get_users_playlist_tracks({'Authorization': 'Bearer BQD7HVMm09TrOlqoaxzNrG4rqd6MJY-yfBSs8E_UGUnF5wE2cbDCDdZCGNJx93mg5vfxZzOjdasYte6PxNgT66jXGVQW2tzA8F9uAR0CAp9SKE4yuPohN_RdxDhrn9mrNU1zzUG97nqAV1IuaZjLfxx2cbJE7AiLiRm4JxxluRXaNQGHw8Uv_-i5ZD0nkf3psAaTDX8immBR3ZwwrSUgWSPTQKH8TUZ2urz3cnZi4OXu12PPKPuny58L'}, "3E9kzE2uBv5CVPX089GWyw")
+        print("playlist_data: ", playlist_data["total"])
+        # print(playlist_data)
+ 
+    get_track_list_len()
+    return "Run script for worker"
+
+
 @app.route('/profile')
 def profile():
     if 'auth_header' in session:
@@ -134,7 +148,6 @@ def playlist(id):
             return render_template("playlist.html",
                                user=profile_data,
                                tracks=playlist_data["items"])
-
     return render_template('playlist.html')
 
 
